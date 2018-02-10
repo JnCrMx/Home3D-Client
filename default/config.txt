@@ -1,0 +1,6 @@
+username=null
+password=null
+printerId=0
+printerModel=null
+hostname=192.168.188.28
+port=819

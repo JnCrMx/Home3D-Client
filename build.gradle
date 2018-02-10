@@ -1,4 +1,7 @@
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'de.jcm.home3d.Home3D'
 
 repositories {
 }
@@ -24,5 +27,76 @@ jar
     manifest 
     {
         attributes 'Main-Class': 'de.jcm.home3d.Home3D'
+    }
+}
+
+task('build_print3d', type:Exec)
+{
+	workingDir 'print3d/'
+	
+	commandLine './build.sh'
+	
+	standardOutput = new ByteArrayOutputStream()
+	ext.output = 
+	{
+		return standardOutput.toString()
+	}
+}
+
+task('build_strip_gcode', type:Exec)
+{
+	workingDir 'strip_gcode/'
+	
+	commandLine './build.sh'
+	
+	standardOutput = new ByteArrayOutputStream()
+	ext.output = 
+	{
+		return standardOutput.toString()
+	}
+}
+
+task('natives')
+{
+	dependsOn 'build_strip_gcode'
+	dependsOn 'build_print3d'
+	
+	tasks.findByName('build_print3d').mustRunAfter 'build_strip_gcode'
+}
+
+task('install')
+{
+	dependsOn 'clean'
+	dependsOn 'jar'
+	dependsOn 'natives'
+	
+	tasks.findByName('jar').mustRunAfter 'clean'
+    tasks.findByName('natives').mustRunAfter 'jar'
+    
+    doLast
+    {
+    	File home = file('/home/Home3D')
+    	if(!home.exists())
+    	{
+    		home.mkdirs();
+    	}
+    	
+    	copy
+    	{
+    		from 'build/libs/Home3D.jar'
+    		from 'print3d/Debug/print3d'
+    		from 'strip_gcode/Debug/strip_gcode'
+    		into home
+    	}
+    	
+    	File config = file(home, 'config.txt')
+    	if(!config.exists())
+    	{
+    		copy
+    		{
+    			from 'default/config.txt'
+    			into home
+    		}
+    	}
     }
 }

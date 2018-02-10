@@ -4,3 +4,6 @@
 [submodule "print3d"]
 	path = print3d
 	url = D:/Projects/JuFo/Home3D/print3d/
+[submodule "strip_gcode"]
+	path = strip_gcode
+	url = D:/Projects/JuFo/Home3D/strip_gcode/
