@@ -64,6 +64,12 @@ task('natives')
 	tasks.findByName('build_print3d').mustRunAfter 'build_strip_gcode'
 }
 
+task('chmod', type:Exec)
+{
+	workingDir '/bin'
+	commandLine 'chmod', '-R', 'a+rwx', '/home/Home3D'
+}
+
 task('install')
 {
 	dependsOn 'clean'
@@ -83,9 +89,9 @@ task('install')
     	
     	copy
     	{
-    		from 'build/libs/Home3D.jar'
     		from 'print3d/Debug/print3d'
     		from 'strip_gcode/Debug/strip_gcode'
+    		from 'build/libs/Home3D.jar'
     		into home
     	}
     	
@@ -98,5 +104,7 @@ task('install')
     			into home
     		}
     	}
+    	
+    	chmod.execute()
     }
 }
