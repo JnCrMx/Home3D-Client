@@ -2,7 +2,7 @@
 Client for Home3D system. Just a small private project.
 
 ## Update
-The update the repository type in:<br>
+To update the repository type in:<br>
 <code>git pull</code><br>
 <code>git submodule update --recursive --remote --force</code>
 
@@ -63,5 +63,10 @@ If there's already an installed version present, it's binaries will be replaced 
 </table>
 
 ## Compile
+If you want to just compile the program or have to install it by yourself, type in:<br>
 <code>./gradlew jar</code><br>
 <code>./gradlew natives</code>
+
+The binaries will be saved as <code>build/libs/Home3D.jar</code>, <code>print3d/Debug/print3d</code> and <code>strip_gcode/Debug/strip_gcode</code>. The default config is stored as <code>default/config.txt</code>.
+
+To work, the three binary files must be saved in one folder together with <code>config.txt</code>. You have to make them <b>executable</b> with <code>chmod +x [file]</code>.
