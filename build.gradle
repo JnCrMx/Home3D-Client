@@ -1,0 +1,28 @@
+apply plugin: 'java'
+
+repositories {
+}
+
+dependencies {
+}
+
+sourceSets
+{
+	main
+	{
+		java
+		{
+			srcDirs 'JCMLib/src'
+		}
+	}
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+jar 
+{
+    manifest 
+    {
+        attributes 'Main-Class': 'de.jcm.home3d.Home3D'
+    }
+}

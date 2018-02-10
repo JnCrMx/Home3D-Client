@@ -1,0 +1,6 @@
+[submodule "JCMLib"]
+	path = JCMLib
+	url = https://github.com/JnCrMx/JCMLib.git
+[submodule "print3d"]
+	path = print3d
+	url = D:/Projects/JuFo/Home3D/print3d/
