@@ -2,5 +2,6 @@ username=null
 password=null
 printerId=0
 printerModel=null
+printerPort=/dev/ttyUSB0
 hostname=192.168.188.28
 port=819

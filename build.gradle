@@ -89,7 +89,7 @@ task('install')
     		into home
     	}
     	
-    	File config = file(home, 'config.txt')
+    	File config = file('/home/Home3D/config.txt')
     	if(!config.exists())
     	{
     		copy
