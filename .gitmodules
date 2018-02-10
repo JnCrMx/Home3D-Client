@@ -3,7 +3,7 @@
 	url = https://github.com/JnCrMx/JCMLib.git
 [submodule "print3d"]
 	path = print3d
-	url = D:/Projects/JuFo/Home3D/print3d/
+	url = https://github.com/JnCrMx/print3d.git
 [submodule "strip_gcode"]
 	path = strip_gcode
-	url = D:/Projects/JuFo/Home3D/strip_gcode/
+	url = https://github.com/JnCrMx/strip_gcode.git
