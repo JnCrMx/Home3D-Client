@@ -60,6 +60,8 @@ public class Home3D
 	private static MainThread main;
 	
 	public static Object notifier;
+	public static File stlDir;
+	public static File gcodeDir;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -96,6 +98,18 @@ public class Home3D
 				System.out.println("Cannot access print3d daemon");
 				System.out.println("Dry run...");
 			}
+		}
+		
+		stlDir=new File("downloads/stl");
+		if(!stlDir.exists())
+		{
+			stlDir.mkdirs();
+		}
+		
+		gcodeDir=new File("downloads/gcode");
+		if(!gcodeDir.exists())
+		{
+			gcodeDir.mkdirs();
 		}
 		
 		PacketIn.register(PacketInEncryption.class); // 1

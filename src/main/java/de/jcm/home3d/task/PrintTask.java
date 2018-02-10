@@ -33,6 +33,9 @@ public class PrintTask extends Task
 			public Void call(File argument)
 			{
 				File file=argument;
+				File f2=new File(Home3D.stlDir, file.getName());
+				file.renameTo(f2);
+				file=f2;
 				if(file.getName().endsWith(".zip"))
 				{
 					ZipFile zip;
@@ -45,7 +48,7 @@ public class PrintTask extends Task
 							ZipEntry entry=entries.nextElement();
 							InputStream in=zip.getInputStream(entry);
 							
-							file=new File(entry.getName());
+							file=new File(Home3D.stlDir, entry.getName());
 							FileOutputStream fout=new FileOutputStream(file);
 							
 							byte[] bytes=new byte[(int) entry.getSize()];
@@ -81,14 +84,11 @@ public class PrintTask extends Task
 					try
 					{
 						setStatus("Slicing...");
+						update();
 						
-						ArrayList<Task> list=new ArrayList<>();
-						list.add(PrintTask.this);
-						Home3D.sendPacket(new PacketOutStatusUpdate(list));
+						File output = new File(Home3D.gcodeDir, file.getName()+".gcode");
 						
-						File output = new File(file.getName()+".gcode");
-						
-						System.out.println(file+" -> "+output);
+						System.out.println(file.getAbsolutePath()+" -> "+output.getAbsolutePath());
 						
 						Process proc=Runtime.getRuntime().exec("slic3r --load " + "slic3r.ini" + " -o " + output.getAbsolutePath() + " -- " + file.getAbsolutePath());
 						InputStream in=proc.getInputStream();
@@ -101,10 +101,7 @@ public class PrintTask extends Task
 						if(output.exists() && exit==0)
 						{
 							setStatus("Printing...");
-							
-							list=new ArrayList<>();
-							list.add(PrintTask.this);
-							Home3D.sendPacket(new PacketOutStatusUpdate(list));
+							update();
 							
 							Runtime.getRuntime().exec("kill -10 " + Home3D.pid);
 							Home3D.fifo.write(("P" + output.getAbsolutePath() + '\0').getBytes());
@@ -120,11 +117,13 @@ public class PrintTask extends Task
 									int max=Integer.parseInt(line.split(" ")[1]);
 									
 									setStatus("Printing... "+step+"/"+max);
+									update();
 								}
 								else
 								{
 									setCode(4);
 									setStatus("Error: "+line);
+									update();
 									break;
 								}
 							}

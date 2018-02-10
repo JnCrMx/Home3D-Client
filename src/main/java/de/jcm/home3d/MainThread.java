@@ -1,10 +1,13 @@
 package de.jcm.home3d;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.jcm.home3d.packet.out.PacketOutEncryption;
+import de.jcm.home3d.packet.out.PacketOutRequestFile;
 import de.jcm.home3d.packet.out.PacketOutStatusUpdate;
 import de.jcm.home3d.task.Task;
+import de.jcm.util.Callback;
 
 public class MainThread extends Thread
 {
@@ -26,6 +29,20 @@ public class MainThread extends Thread
 			}
 		}
 		System.out.println("Main loop started");
+		
+		
+		if(!(new File("slic3r.ini")).exists())
+		{
+			PacketOutRequestFile packet = new PacketOutRequestFile("slic3r.ini", new Callback<Void, File>()
+			{
+				@Override
+				public Void call(File argument)
+				{
+					return null;
+				}
+			});
+			Home3D.sendPacket(packet);
+		}
 		
 		while(true)
 		{

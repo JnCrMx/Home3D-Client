@@ -1,5 +1,10 @@
 package de.jcm.home3d.task;
 
+import java.util.ArrayList;
+
+import de.jcm.home3d.Home3D;
+import de.jcm.home3d.packet.out.PacketOutStatusUpdate;
+
 public abstract class Task extends Thread
 {
 	private int id;
@@ -149,6 +154,13 @@ public abstract class Task extends Thread
 	{
 		setCode(2);
 		super.start();
+	}
+	
+	public void update()
+	{
+		ArrayList<Task> list=new ArrayList<>();
+		list.add(this);
+		Home3D.sendPacket(new PacketOutStatusUpdate(list));
 	}
 
 	/**
