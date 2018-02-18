@@ -124,6 +124,14 @@ public class PrintTask extends Task
 										int step=Integer.parseInt(line.split(" ")[0]);
 										int max=Integer.parseInt(line.split(" ")[1]);
 										
+										if(step==max)
+										{
+											setCode(3);
+											setStatus("Print task done!");
+											update();
+											break;
+										}
+										
 										setStatus("Printing... "+step+"/"+max);
 										update();
 									}
