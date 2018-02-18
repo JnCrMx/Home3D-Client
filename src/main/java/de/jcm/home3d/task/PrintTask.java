@@ -86,46 +86,60 @@ public class PrintTask extends Task
 						setStatus("Slicing...");
 						update();
 						
-						File output = new File(Home3D.gcodeDir, file.getName()+".gcode");
+						File output = new File(Home3D.gcodeDir, file.getName().replace(' ', '_')+".gcode.tmp");
 						
 						System.out.println(file.getAbsolutePath()+" -> "+output.getAbsolutePath());
 						
-						Process proc=Runtime.getRuntime().exec("slic3r --load " + "slic3r.ini" + " -o " + output.getAbsolutePath() + " -- " + file.getAbsolutePath());
-						InputStream in=proc.getInputStream();
+						Process process=Runtime.getRuntime().exec("slic3r --load " + "slic3r.ini" + " -o " + output.getAbsolutePath() + " -- " + file.getAbsolutePath());
+						InputStream in=process.getInputStream();
 						
 						int r;
 						while((r=in.read())!=-1)
 							System.out.write(r);
 						
-						int exit=proc.waitFor();
+						int exit=process.waitFor();
 						if(output.exists() && exit==0)
 						{
-							setStatus("Printing...");
-							update();
+							File gcode = new File(Home3D.gcodeDir, file.getName().replace(' ', '_')+".gcode");
 							
-							Runtime.getRuntime().exec("kill -10 " + Home3D.pid);
-							Home3D.fifo.write(("P" + output.getAbsolutePath() + '\0').getBytes());
-							
-							sleep(1000);
-							
-							while(true)
+							process=Runtime.getRuntime().exec("./strip_gcode -o "+gcode.getAbsolutePath()+" "+output.getAbsolutePath());
+							exit=process.waitFor();
+							if(gcode.exists() && exit==0)
 							{
-								String line=Home3D.fifo.readLine();
-								if(line.matches("[0-9]* [0-9]*"))
+								output.delete();
+								
+								setStatus("Printing...");
+								update();
+								
+								Runtime.getRuntime().exec("kill -10 " + Home3D.pid);
+								Home3D.fifo.write(("P" + gcode.getAbsolutePath() + '\0').getBytes());
+								
+								sleep(1000);
+								
+								while(true)
 								{
-									int step=Integer.parseInt(line.split(" ")[0]);
-									int max=Integer.parseInt(line.split(" ")[1]);
-									
-									setStatus("Printing... "+step+"/"+max);
-									update();
+									String line=Home3D.fifo.readLine();
+									if(line.matches("[0-9]* [0-9]*"))
+									{
+										int step=Integer.parseInt(line.split(" ")[0]);
+										int max=Integer.parseInt(line.split(" ")[1]);
+										
+										setStatus("Printing... "+step+"/"+max);
+										update();
+									}
+									else
+									{
+										setCode(4);
+										setStatus("Error: "+line);
+										update();
+										break;
+									}
 								}
-								else
-								{
-									setCode(4);
-									setStatus("Error: "+line);
-									update();
-									break;
-								}
+							}
+							else
+							{
+								setCode(4);
+								setStatus("strip_gcode returned exit code "+exit+"!");
 							}
 						}
 						else
