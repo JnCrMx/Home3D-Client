@@ -108,3 +108,8 @@ task('install')
     	chmod.execute()
     }
 }
+
+run
+{
+	workingDir 'test/'
+}
