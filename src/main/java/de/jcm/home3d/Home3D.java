@@ -35,7 +35,7 @@ public class Home3D
 	private static DataOutputStream out;
 	private static DataInputStream in;
 	
-	public static final int BIT_LEGTH = 1024;
+	public static int BIT_LEGTH = 1024;
 	
 	public static int userId;
 	
@@ -66,6 +66,11 @@ public class Home3D
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception
 	{
+		if(args.length>0)
+		{
+			BIT_LEGTH=Integer.parseInt(args[0]);
+		}
+		
 		notifier=new Object();
 		
 		//Read config
