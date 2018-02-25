@@ -146,6 +146,9 @@ public class Home3D
 			{
 				if(a2[j] != c2[j])
 				{
+					System.out.println("a2["+j+"] != c2["+j+"]");
+					System.out.println(a2[j]+" != "+c2[j]);
+					
 					array = false;
 					break;
 				}
