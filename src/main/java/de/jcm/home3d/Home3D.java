@@ -35,7 +35,7 @@ public class Home3D
 	private static DataOutputStream out;
 	private static DataInputStream in;
 	
-	public static final int BIT_LEGTH = 2048;
+	public static final int BIT_LEGTH = 1024;
 	
 	public static int userId;
 	
