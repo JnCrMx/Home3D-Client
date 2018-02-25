@@ -158,6 +158,11 @@ public abstract class Task extends Thread
 	
 	public void update()
 	{
+		changed=false;
+		
+		//Debug
+		System.out.println(status);
+		
 		ArrayList<Task> list=new ArrayList<>();
 		list.add(this);
 		Home3D.sendPacket(new PacketOutStatusUpdate(list));

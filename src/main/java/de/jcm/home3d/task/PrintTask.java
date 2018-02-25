@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -108,11 +109,21 @@ public class PrintTask extends Task
 							{
 								output.delete();
 								
+								FileOutputStream fout=new FileOutputStream(gcode, true);
+								fout.write("M140 S0\n".getBytes());
+								fout.close();
+								
 								setStatus("Printing...");
 								update();
 								
 								Runtime.getRuntime().exec("kill -10 " + Home3D.pid);
-								Home3D.fifo.write(("P" + gcode.getAbsolutePath() + '\0').getBytes());
+								
+								ByteBuffer buffer=ByteBuffer.allocate(4096 + 1);
+								buffer.put((byte) 'P');
+								buffer.put(gcode.getAbsolutePath().getBytes());
+								buffer.put((byte) 0);
+								
+								Home3D.fifo.write(buffer.array());
 								
 								sleep(1000);
 								

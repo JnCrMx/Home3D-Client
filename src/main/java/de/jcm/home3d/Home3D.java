@@ -40,7 +40,7 @@ public class Home3D
 	public static int userId;
 	
 	public static Callback<Void, File> fileCallback;
-	public static String fileName="--||--";
+	public static String fileName="";
 	
 	public static int pid;
 	public static RandomAccessFile fifo;
@@ -63,6 +63,7 @@ public class Home3D
 	public static File stlDir;
 	public static File gcodeDir;
 	
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception
 	{
 		notifier=new Object();
@@ -168,25 +169,35 @@ public class Home3D
 			return;
 		}
 		
-		Socket sck = new Socket(hostname, port);
-		in = new DataInputStream(sck.getInputStream());
-		out = new DataOutputStream(sck.getOutputStream());
-		
-		main=new MainThread();
-		main.start();
-		
-		while(!sck.isClosed())
+		while(true)
 		{
-			for(Task task : tasks.values())
+			Socket sck = new Socket(hostname, port);
+			in = new DataInputStream(sck.getInputStream());
+			out = new DataOutputStream(sck.getOutputStream());
+			
+			if(main!=null)
+				main.stop();
+			
+			main=new MainThread();
+			main.start();
+			
+			while(!sck.isClosed())
 			{
-				if(task.getCode()==1)
+				for(Task task : tasks.values())
 				{
-					task.start();
+					if(task.getCode()==1)
+					{
+						task.start();
+					}
 				}
+				receive();
 			}
-			receive();
+			
+			System.out.println("Lost connection!");
+			System.out.println("Restarting...");
+			
+			sck.close();
 		}
-		sck.close();
 	}
 	
 	public static void receive()

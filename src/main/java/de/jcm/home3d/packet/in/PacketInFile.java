@@ -69,7 +69,7 @@ public class PacketInFile extends PacketIn<PacketOutRequestFile>
 		System.gc();
 		
 		System.out.println("File "+Home3D.fileName+" received!");
-		if(Home3D.fileCallback != null)
+		if(Home3D.fileCallback != null && !Home3D.fileName.isEmpty())
 		{
 			if(checksumClient.equals(checksumServer))
 			{
@@ -82,7 +82,7 @@ public class PacketInFile extends PacketIn<PacketOutRequestFile>
 			}
 		}
 		
-		Home3D.fileName="--||--";
+		Home3D.fileName="";
 		
 		return null;
 	}
