@@ -130,6 +130,7 @@ public class PrintTask extends Task
 								while(true)
 								{
 									String line=Home3D.fifo.readLine();
+									System.out.println(line);
 									if(line.matches("[0-9]* [0-9]*"))
 									{
 										int step=Integer.parseInt(line.split(" ")[0]);
@@ -140,11 +141,20 @@ public class PrintTask extends Task
 											setCode(3);
 											setStatus("Print task done!");
 											update();
-											break;
+											//break; //?
 										}
-										
-										setStatus("Printing... "+step+"/"+max);
-										//update();
+										else
+										{
+											setStatus("Printing... "+step+"/"+max);
+											//update();
+										}
+									}
+									else if(line.equals("ok"))
+									{
+										setCode(3);
+										setStatus("Print task done!");
+										update();
+										break;
 									}
 									else
 									{

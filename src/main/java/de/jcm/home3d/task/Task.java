@@ -161,7 +161,7 @@ public abstract class Task extends Thread
 		changed=false;
 		
 		//Debug
-		System.out.println(status);
+		//System.out.println(status);
 		
 		ArrayList<Task> list=new ArrayList<>();
 		list.add(this);
