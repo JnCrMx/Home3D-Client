@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Set;
 
 import de.jcm.home3d.packet.in.PacketIn;
 import de.jcm.home3d.packet.in.PacketInDisconnected;
@@ -191,6 +192,9 @@ public class Home3D
 			
 			while(!sck.isClosed())
 			{
+				Set<Thread> set = Thread.getAllStackTraces().keySet();
+				set.forEach(thread -> System.out.println(thread));
+				
 				for(Task task : tasks.values())
 				{
 					if(task.getCode()==1)
@@ -214,6 +218,8 @@ public class Home3D
 		{
 			int packetLength = in.readInt();
 			
+			System.out.println(packetLength);
+			
 			byte[] packetData = new byte[packetLength];
 			for(int i=0;i<packetLength;i++)
 				packetData[i]=in.readByte();
@@ -235,6 +241,8 @@ public class Home3D
 	{
 		try
 		{
+			System.out.println("-> "+packet);
+			
 			byte id = packet.getPacketId();
 			ByteArrayOutputStream array = new ByteArrayOutputStream();
 			DataOutputStream tout = new DataOutputStream(array);

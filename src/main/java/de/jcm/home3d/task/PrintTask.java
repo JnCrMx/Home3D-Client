@@ -144,7 +144,7 @@ public class PrintTask extends Task
 										}
 										
 										setStatus("Printing... "+step+"/"+max);
-										update();
+										//update();
 									}
 									else
 									{
@@ -186,6 +186,7 @@ public class PrintTask extends Task
 					Home3D.sendPacket(new PacketOutStatusUpdate(list));
 						
 				}
+				update();
 				return null;
 			}
 		});

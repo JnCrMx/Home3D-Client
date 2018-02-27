@@ -11,6 +11,11 @@ import de.jcm.util.Callback;
 
 public class MainThread extends Thread
 {
+	public MainThread()
+	{
+		super("main");
+	}
+	
 	@Override
 	public void run()
 	{
