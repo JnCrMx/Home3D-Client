@@ -27,7 +27,7 @@ public class PrintTask extends Task
 	@Override
 	public void run()
 	{
-		setStatus("Downloading...");
+		setStatus("downloading");
 		PacketOutRequestFile packet = new PacketOutRequestFile(getArgument(), new Callback<Void, File>()
 		{
 			@Override
@@ -84,7 +84,7 @@ public class PrintTask extends Task
 				{
 					try
 					{
-						setStatus("Slicing...");
+						setStatus("slicing");
 						update();
 						
 						File output = new File(Home3D.gcodeDir, file.getName().replace(' ', '_')+".gcode.tmp");
@@ -113,7 +113,7 @@ public class PrintTask extends Task
 								fout.write("M140 S0\n".getBytes());
 								fout.close();
 								
-								setStatus("Printing...");
+								setStatus("printing");
 								update();
 								
 								Runtime.getRuntime().exec("kill -10 " + Home3D.pid);
@@ -139,27 +139,27 @@ public class PrintTask extends Task
 										if(step==max)
 										{
 											setCode(3);
-											setStatus("Print task done!");
+											setStatus("printing done");
 											update();
 											//break; //?
 										}
 										else
 										{
-											setStatus("Printing... "+step+"/"+max);
+											setStatus("printing "+step+"/"+max);
 											//update();
 										}
 									}
 									else if(line.equals("ok"))
 									{
 										setCode(3);
-										setStatus("Print task done!");
+										setStatus("printing done");
 										update();
 										break;
 									}
 									else
 									{
 										setCode(4);
-										setStatus("Error: "+line);
+										setStatus("printing error "+line);
 										update();
 										break;
 									}
@@ -168,13 +168,13 @@ public class PrintTask extends Task
 							else
 							{
 								setCode(4);
-								setStatus("strip_gcode returned exit code "+exit+"!");
+								setStatus("slicing error "+exit+"!");
 							}
 						}
 						else
 						{
 							setCode(4);
-							setStatus("Slic3r returned exit code "+exit+"!");
+							setStatus("slicing error "+exit+"!");
 						}
 					}
 					catch(IOException e)

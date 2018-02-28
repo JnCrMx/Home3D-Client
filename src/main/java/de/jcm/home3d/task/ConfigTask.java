@@ -19,7 +19,7 @@ public class ConfigTask extends Task
 	{
 		if(getArgument().equals("updateSlic3r"))
 		{
-			setStatus("Slic3r config updating!");
+			setStatus("updating slic3r");
 			PacketOutRequestFile packet = new PacketOutRequestFile("slic3r.ini", new Callback<Void, File>()
 			{
 				
@@ -27,7 +27,7 @@ public class ConfigTask extends Task
 				public Void call(File argument)
 				{
 					setCode(3);
-					setStatus("Slic3r config updated!");
+					setStatus("updating slic3r done");
 					return null;
 				}
 			});
@@ -35,7 +35,7 @@ public class ConfigTask extends Task
 		}
 		else
 		{
-			setStatus("Config updating!");
+			setStatus("updating config");
 			String[] options=getArgument().split(";");
 			for(String string : options)
 			{
@@ -67,7 +67,7 @@ public class ConfigTask extends Task
 			}
 			
 			setCode(3);
-			setStatus("Config updated!");
+			setStatus("updating config done");
 		}
 	}
 	
