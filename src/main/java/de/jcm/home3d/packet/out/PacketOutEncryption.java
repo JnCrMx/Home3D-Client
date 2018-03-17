@@ -2,13 +2,11 @@ package de.jcm.home3d.packet.out;
 
 import java.io.DataOutputStream;
 
-import de.jcm.security.rsa.RSAPublicKey;
-
 public class PacketOutEncryption extends PacketOut
 {
-	private RSAPublicKey key;
+	byte[] key;
 	
-	public PacketOutEncryption(RSAPublicKey key)
+	public PacketOutEncryption(byte[] key)
 	{
 		this.key = key;
 	}
@@ -18,13 +16,8 @@ public class PacketOutEncryption extends PacketOut
 	{
 		try
 		{
-			byte[] exponent = key.getExponent().toByteArray();
-			byte[] modulo = key.getModulo().toByteArray();
-			
-			out.writeInt(exponent.length);
-			out.write(exponent);
-			out.writeInt(modulo.length);
-			out.write(modulo);
+			out.writeInt(key.length);
+			out.write(key);
 		}
 		catch(Exception e)
 		{

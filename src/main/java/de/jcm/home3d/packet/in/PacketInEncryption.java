@@ -4,10 +4,11 @@ import java.io.DataInputStream;
 import java.math.BigInteger;
 
 import de.jcm.home3d.Home3D;
-import de.jcm.home3d.packet.out.PacketOutLogin;
+import de.jcm.home3d.packet.out.PacketOut;
+import de.jcm.home3d.packet.out.PacketOutEncryption;
 import de.jcm.security.rsa.RSAPublicKey;
 
-public class PacketInEncryption extends PacketIn<PacketOutLogin>
+public class PacketInEncryption extends PacketIn<PacketOut>
 {
 	private RSAPublicKey key;
 	
@@ -39,10 +40,10 @@ public class PacketInEncryption extends PacketIn<PacketOutLogin>
 	}
 	
 	@Override
-	public PacketOutLogin handle()
+	public PacketOutEncryption handle()
 	{
 		Home3D.startEncryption(key);
-		return new PacketOutLogin(Home3D.username, Home3D.password, Home3D.printerId);
+		return new PacketOutEncryption(Home3D.myKeyBytes);
 	}
 	
 	@Override

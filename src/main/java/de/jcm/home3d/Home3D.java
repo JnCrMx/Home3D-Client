@@ -8,12 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.Set;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import de.jcm.home3d.packet.in.PacketIn;
 import de.jcm.home3d.packet.in.PacketInDisconnected;
@@ -22,21 +24,23 @@ import de.jcm.home3d.packet.in.PacketInFile;
 import de.jcm.home3d.packet.in.PacketInLoginSuccess;
 import de.jcm.home3d.packet.in.PacketInTaskUpdate;
 import de.jcm.home3d.packet.out.PacketOut;
+import de.jcm.home3d.packet.out.PacketOutEncryption;
 import de.jcm.home3d.task.Task;
-import de.jcm.security.rsa.RSAKeyPair;
 import de.jcm.security.rsa.RSAPublicKey;
 import de.jcm.util.Callback;
 
 public class Home3D
 {
-	public static RSAKeyPair myKeys;
+	public static int KEY_BYTES = 16;
+	
+	public static SecretKeySpec myKey;
+	public static byte[] myKeyBytes;
+	
 	public static RSAPublicKey serverKey;
-	static boolean encrypted;
+	static int encrypted;
 	
 	private static DataOutputStream out;
 	private static DataInputStream in;
-	
-	public static int BIT_LEGTH = 1024;
 	
 	public static int userId;
 	
@@ -67,11 +71,6 @@ public class Home3D
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception
 	{
-		if(args.length>0)
-		{
-			BIT_LEGTH=Integer.parseInt(args[0]);
-		}
-		
 		notifier=new Object();
 		
 		//Read config
@@ -127,56 +126,13 @@ public class Home3D
 														// 6
 		PacketIn.register(PacketInFile.class); // 7
 		
-		System.out.println("Generating keys (length=" + BIT_LEGTH + ")...");
-		for(int i = 0; i < 100; i++)
-		{
-			System.out.println("Try " + (i + 1) + "/" + 100);
-			System.out.flush();
-			myKeys = RSAKeyPair.generate(new SecureRandom(), BIT_LEGTH);
-			
-			BigInteger a1 = new BigInteger(myKeys.getPublicKey().getModulo().bitLength() - 1, new SecureRandom());
-			BigInteger b1 = myKeys.getPublicKey().encrypt(a1);
-			BigInteger c1 = myKeys.getPrivateKey().decrypt(b1);
+		System.out.println("Generating keys (length=" + KEY_BYTES + ")...");
 
-			byte[] a2 = new BigInteger(myKeys.getPublicKey().getModulo().bitLength() * 2, new SecureRandom()).toByteArray();
-			byte[] b2 = myKeys.getPublicKey().encrypt(a2);
-			byte[] c2 = myKeys.getPrivateKey().decrypt(b2);
+		myKeyBytes=new byte[KEY_BYTES];
+		SecureRandom random=new SecureRandom();
+		random.nextBytes(myKeyBytes);
 			
-			boolean array = true;
-			for(int j = 0; j < a2.length; j++)
-			{
-				if(a2[j] != c2[j])
-				{
-					System.out.println("a2["+j+"] != c2["+j+"]");
-					System.out.println(a2[j]+" != "+c2[j]);
-					
-					array = false;
-					break;
-				}
-			}
-			
-			if(a1.equals(c1) && (!a1.equals(b1)) && array)
-			{
-				System.out.println("Key generation succeeded");
-				System.err.println("Public key: " + myKeys.getPublicKey().getExponent());
-				System.err.println("Private key: " + myKeys.getPrivateKey().getExponent());
-				System.err.println("Modulo: " + myKeys.getPublicKey().getModulo());
-				// System.err.println("Results:");
-				// System.err.println("a="+a1);
-				// System.err.println("b="+b1);
-				// System.err.println("c="+c1);
-				// System.err.println("Details:");
-				// System.err.println("Bit
-				// length="+myKeys.getPublicKey().getModulo().bitLength());
-				break;
-			}
-			myKeys = null;
-		}
-		if(myKeys == null)
-		{
-			System.out.println("Key generation failed");
-			return;
-		}
+		myKey = new SecretKeySpec(myKeyBytes, "AES");
 		
 		while(true)
 		{
@@ -192,8 +148,8 @@ public class Home3D
 			
 			while(!sck.isClosed())
 			{
-				Set<Thread> set = Thread.getAllStackTraces().keySet();
-				set.forEach(thread -> System.out.println(thread));
+//				Set<Thread> set = Thread.getAllStackTraces().keySet();
+//				set.forEach(thread -> System.out.println(thread));
 				
 				for(Task task : tasks.values())
 				{
@@ -218,16 +174,20 @@ public class Home3D
 		{
 			int packetLength = in.readInt();
 			
-			System.out.println(packetLength);
-			
 			byte[] packetData = new byte[packetLength];
 			for(int i=0;i<packetLength;i++)
 				packetData[i]=in.readByte();
 			
-			if(encrypted)
-				packetData = myKeys.getPrivateKey().decrypt(packetData);
+			if(encrypted==2)
+			{
+				Cipher c = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				c.init(Cipher.DECRYPT_MODE, myKey, new IvParameterSpec(myKey.getEncoded()));
+				
+				packetData = c.doFinal(packetData);
+			}
 			
 			PacketOut response = PacketIn.handle(packetData);
+			
 			if(response != null)
 				sendPacket(response);
 		}
@@ -240,9 +200,7 @@ public class Home3D
 	public static void sendPacket(PacketOut packet)
 	{
 		try
-		{
-			System.out.println("-> "+packet);
-			
+		{			
 			byte id = packet.getPacketId();
 			ByteArrayOutputStream array = new ByteArrayOutputStream();
 			DataOutputStream tout = new DataOutputStream(array);
@@ -251,11 +209,31 @@ public class Home3D
 			
 			byte[] bytes = array.toByteArray();
 			
-			if(encrypted)
+			if(encrypted==1)
+			{
 				bytes = serverKey.encrypt(bytes);
+			}
+			else if(encrypted==2)
+			{
+				Cipher c = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				c.init(Cipher.ENCRYPT_MODE, myKey, new IvParameterSpec(myKey.getEncoded()));
+				
+				bytes = c.doFinal(bytes);
+			}
+
+			System.out.println("-> " + packet + "@" + bytes.length);
 			
 			out.writeInt(bytes.length);
 			out.write(bytes);
+			
+			if(packet instanceof PacketOutEncryption)
+			{
+				startEncryption();
+				synchronized(notifier)
+				{
+					notifier.notifyAll();
+				}
+			}
 		}
 		catch(Exception e)
 		{
@@ -266,14 +244,16 @@ public class Home3D
 	public static void startEncryption(RSAPublicKey key)
 	{
 		serverKey = key;
-		encrypted = true;
+		encrypted = 1;
 		
-		System.out.println("Encryption started");
+		System.out.println("RSA Encryption started");
+	}
+	
+	public static void startEncryption()
+	{
+		encrypted = 2;
 		
-		synchronized(notifier)
-		{
-			notifier.notifyAll();
-		}
+		System.out.println("AES Encryption started");
 	}
 	
 	public static void readConfig()

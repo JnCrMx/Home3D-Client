@@ -3,7 +3,7 @@ package de.jcm.home3d;
 import java.io.File;
 import java.util.ArrayList;
 
-import de.jcm.home3d.packet.out.PacketOutEncryption;
+import de.jcm.home3d.packet.out.PacketOutLogin;
 import de.jcm.home3d.packet.out.PacketOutRequestFile;
 import de.jcm.home3d.packet.out.PacketOutStatusUpdate;
 import de.jcm.home3d.task.Task;
@@ -18,10 +18,7 @@ public class MainThread extends Thread
 	
 	@Override
 	public void run()
-	{
-		Home3D.sendPacket(new PacketOutEncryption(Home3D.myKeys.getPublicKey()));
-		Home3D.encrypted = true;
-		
+	{		
 		synchronized(Home3D.notifier)
 		{
 			try
@@ -35,6 +32,7 @@ public class MainThread extends Thread
 		}
 		System.out.println("Main loop started");
 		
+		Home3D.sendPacket(new PacketOutLogin(Home3D.username, Home3D.password, Home3D.printerId));
 		
 		if(!(new File("slic3r.ini")).exists())
 		{

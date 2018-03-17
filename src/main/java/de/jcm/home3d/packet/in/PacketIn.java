@@ -64,6 +64,9 @@ public abstract class PacketIn<R extends PacketOut>
 			if(clazz != null)
 			{								
 				PacketIn<?> instance = clazz.newInstance();
+				
+				System.out.println("<- "+instance);
+				
 				instance.read(in);
 				return instance.handle();
 			}
