@@ -27,6 +27,8 @@ public class PrintTask extends Task
 	@Override
 	public void run()
 	{
+		super.run();
+		
 		setStatus("downloading");
 		PacketOutRequestFile packet = new PacketOutRequestFile(getArgument(), new Callback<Void, File>()
 		{

@@ -17,6 +17,8 @@ public class ConfigTask extends Task
 	@Override
 	public void run()
 	{
+		super.run();
+		
 		if(getArgument().equals("updateSlic3r"))
 		{
 			setStatus("updating slic3r");

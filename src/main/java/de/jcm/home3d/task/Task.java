@@ -107,9 +107,12 @@ public abstract class Task extends Thread
 	
 	/**
 	 * <b>Do NOT call</b><br>
-	 * Does NOT set <code>changed</codes>
+	 * Sets <code>code</codes> to <code>2</code>
 	 */
-	public abstract void run();
+	public void run()
+	{
+		setCode(2);
+	}
 	
 	/**
 	 * @return the active
@@ -144,17 +147,7 @@ public abstract class Task extends Thread
 	public void setArgument(String argument)
 	{
 		this.argument = argument;
-	}
-	
-	/**
-	 * Sets <code>changed</changed> by calling <code>setCode(2);</code>
-	 */
-	@Override
-	public synchronized void start()
-	{
-		setCode(2);
-		super.start();
-	}
+	}	
 	
 	public void update()
 	{

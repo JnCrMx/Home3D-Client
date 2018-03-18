@@ -16,6 +16,8 @@ public class StopTask extends Task
 	@Override
 	public void run()
 	{
+		super.run();
+		
 		for(Task task : Home3D.tasks.values())
 		{
 			if(task!=this)
