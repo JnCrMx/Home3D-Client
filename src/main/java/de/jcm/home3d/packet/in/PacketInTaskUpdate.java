@@ -9,6 +9,7 @@ import de.jcm.home3d.Home3D;
 import de.jcm.home3d.packet.out.PacketOut;
 import de.jcm.home3d.task.ConfigTask;
 import de.jcm.home3d.task.PrintTask;
+import de.jcm.home3d.task.StopTask;
 import de.jcm.home3d.task.Task;
 
 public class PacketInTaskUpdate extends PacketIn<PacketOut>
@@ -37,6 +38,8 @@ public class PacketInTaskUpdate extends PacketIn<PacketOut>
 					task=new ConfigTask(id, name, argument);
 				else if(type==2)
 					task=new PrintTask(id, name, argument);
+				else if(type==3)
+					task=new StopTask(id, name, argument);
 				
 				if(task!=null)
 				{
